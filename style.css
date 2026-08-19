@@ -833,9 +833,10 @@ p { line-height: 1.6; }
 /* Pack the bag — a fixed, generous desktop-only canvas: the bag sits dead
    center and items are scattered all the way around it (see initPackBag in
    script.js for the actual placement math). */
-.pack-wrap { display: flex; justify-content: center; }
+.pack-wrap { display: flex; justify-content: center; overflow: hidden; width: 100%; }
 .pack-scatter {
   position: relative;
+  flex-shrink: 0;
   width: 820px;
   height: 680px;
 }

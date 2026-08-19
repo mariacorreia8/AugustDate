@@ -1024,6 +1024,20 @@
 
   let packState = null;
 
+  // Scales the fixed 820x680 .pack-scatter box down to fit narrow screens
+  // (e.g. phones), keeping every item's relative position intact.
+  function fitPackScatter() {
+    const scatter = document.getElementById('pack-scatter');
+    const panel = document.getElementById('game-1');
+    if (!scatter || !panel) return;
+    const available = panel.clientWidth - 48; // roughly the panel's own left/right padding
+    const scale = Math.min(1, available / 820);
+    scatter.style.transform = `scale(${scale})`;
+    scatter.style.transformOrigin = 'top center';
+    scatter.parentElement.style.height = `${680 * scale}px`;
+  }
+  window.addEventListener('resize', fitPackScatter);
+
   function initPackBag() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
     if (done >= 1) return;
@@ -1036,10 +1050,12 @@
 
     packState = { packed: new Set() };
 
-    // Scatter every item in a ring all the way around the bag (this is a
-    // fixed, generously-sized desktop layout — it isn't trying to also fit
-    // small screens). Golden-angle spacing spreads them evenly without
-    // clumping; radius grows a little with each item so they fan outward.
+    // Scatter every item in a ring all the way around the bag. The
+    // positions below are computed for a fixed 820x680 "virtual" canvas;
+    // fitPackScatter() scales the whole thing down with CSS transform to
+    // fit small screens, so this math never needs to change per device.
+    // Golden-angle spacing spreads items evenly without clumping; radius
+    // grows a little with each item so they fan outward.
     const allItems = shuffle([...CORRECT_ITEMS, ...WRONG_ITEMS]);
     const cx = 410, cy = 340; // center of the 820x680 .pack-scatter box
     const minRadius = 190, maxRadius = 300;
@@ -1069,6 +1085,8 @@
 
       scatter.appendChild(el);
     });
+
+    fitPackScatter();
 
     bag.addEventListener('dragover', (e) => { e.preventDefault(); bag.classList.add('drag-over'); });
     bag.addEventListener('dragleave', () => bag.classList.remove('drag-over'));
