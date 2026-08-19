@@ -378,7 +378,15 @@
      GAMES ORCHESTRATION
      ======================================================================= */
   const GAME_PANELS = [1, 2, 3, 4, 5].map(n => document.getElementById('game-' + n));
+  const lockedPanel = document.getElementById('game-locked');
   const progressSteps = document.querySelectorAll('.progress-step');
+
+  // Game 1 (Pack the Bag) opens as soon as the games screen itself does
+  // (Friday night). Games 2-5 stay behind a second gate until Saturday
+  // 13:00 — the same "we leave home" moment shown on the landing countdown.
+  function isLevel2Unlocked() {
+    return Date.now() >= countdownTarget;
+  }
 
   function renderGamesProgress() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
@@ -389,21 +397,50 @@
     });
   }
 
+  let gamesLockInterval = null;
+
   function showCurrentGamePanel() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
     const activeIndex = Math.min(done + 1, 5); // 1-based
     GAME_PANELS.forEach(p => p.classList.remove('active'));
+    lockedPanel.classList.remove('active');
+    clearInterval(gamesLockInterval);
+
+    if (activeIndex > 1 && !isLevel2Unlocked()) {
+      lockedPanel.classList.add('active');
+      updateGamesLockCountdown();
+      gamesLockInterval = setInterval(() => {
+        if (isLevel2Unlocked()) {
+          clearInterval(gamesLockInterval);
+          showCurrentGamePanel(); // swap straight to the real game
+        } else {
+          updateGamesLockCountdown();
+        }
+      }, 1000);
+      return;
+    }
+
     const panel = document.getElementById('game-' + activeIndex);
     panel.classList.add('active');
     initGame(activeIndex);
   }
 
+  function updateGamesLockCountdown() {
+    const diff = Math.max(0, countdownTarget - Date.now());
+    const hours = Math.floor(diff / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
+    document.getElementById('gl-hours').textContent = pad(hours);
+    document.getElementById('gl-mins').textContent = pad(mins);
+    document.getElementById('gl-secs').textContent = pad(secs);
+  }
+
   function initGame(n) {
-    if (n === 1) initWordle();
-    if (n === 2) initLemonCatch();
-    if (n === 3) initMemory();
-    if (n === 4) initRunner();
-    if (n === 5) initPackBag();
+    if (n === 1) initPackBag();
+    if (n === 2) initWordle();
+    if (n === 3) initLemonCatch();
+    if (n === 4) initMemory();
+    if (n === 5) initRunner();
   }
 
   function completeGame(n) {
@@ -439,7 +476,7 @@
 
   function initWordle() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
-    if (done >= 1) return; // already solved previously
+    if (done >= 2) return; // already solved previously
     const grid = document.getElementById('wordle-grid');
     const kb = document.getElementById('wordle-keyboard');
     const msg = document.getElementById('wordle-message');
@@ -574,11 +611,11 @@
       if (isWin) {
         wordleState.finished = true;
         document.removeEventListener('keydown', wordleKeyListener);
-        showGameNotice({ title: 'Boa!', onNext: () => completeGame(1) });
+        showGameNotice({ title: 'Boa!', onNext: () => completeGame(2) });
       } else if (wordleState.row >= MAX_ATTEMPTS) {
         wordleState.finished = true;
         document.removeEventListener('keydown', wordleKeyListener);
-        showGameNotice({ title: 'Não desta vez!', onNext: () => completeGame(1) });
+        showGameNotice({ title: 'Não desta vez!', onNext: () => completeGame(2) });
       }
     }, 5 * 180 + 200);
   }
@@ -590,7 +627,7 @@
 
   function initLemonCatch() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
-    if (done >= 2) return;
+    if (done >= 3) return;
     if (lemonState && lemonState.rafId) cancelAnimationFrame(lemonState.rafId);
 
     const canvas = document.getElementById('lemon-canvas');
@@ -699,7 +736,7 @@
 
       if (lemonState.lemons >= 20) {
         lemonState.running = false;
-        showGameNotice({ title: 'Boa apanha!', onNext: () => completeGame(2) });
+        showGameNotice({ title: 'Boa apanha!', onNext: () => completeGame(3) });
         return;
       }
       if (lemonState.rocks >= 5) {
@@ -749,7 +786,7 @@
 
   function initMemory() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
-    if (done >= 3) return;
+    if (done >= 4) return;
 
     const grid = document.getElementById('memory-grid');
     const msg = document.getElementById('memory-message');
@@ -797,7 +834,7 @@
         memoryState.flipped = [];
         memoryState.locked = false;
         if (memoryState.matched === MEMORY_ICONS.length) {
-          showGameNotice({ title: 'Boaaaa!', onNext: () => completeGame(3) });
+          showGameNotice({ title: 'Boaaaa!', onNext: () => completeGame(4) });
         }
       } else {
         setTimeout(() => {
@@ -825,7 +862,7 @@
 
   function initRunner() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
-    if (done >= 4) return;
+    if (done >= 5) return;
     if (runnerState && runnerState.rafId) cancelAnimationFrame(runnerState.rafId);
 
     const canvas = document.getElementById('runner-canvas');
@@ -922,7 +959,7 @@
       if (runnerState.score >= 8) {
         runnerState.running = false;
         if (runnerState.cleanup) runnerState.cleanup();
-        showGameNotice({ title: 'Voou lindamente!', onNext: () => completeGame(4) });
+        showGameNotice({ title: 'Voou lindamente!', onNext: () => completeGame(5) });
         return;
       }
 
@@ -972,7 +1009,7 @@
 
   function initPackBag() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
-    if (done >= 5) return;
+    if (done >= 1) return;
 
     const scatter = document.getElementById('pack-scatter');
     const bag = document.getElementById('pack-bag');
@@ -1065,7 +1102,7 @@
       bagItems.appendChild(bagEl);
 
       if (packState.packed.size === CORRECT_ITEMS.length) {
-        showGameNotice({ title: 'Mala feita!', onNext: () => completeGame(5) });
+        showGameNotice({ title: 'Mala feita!', onNext: () => completeGame(1) });
       }
     }
 

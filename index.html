@@ -86,18 +86,38 @@
 
   <header class="games-header">
     <div class="progress-track" id="progress-track">
-      <div class="progress-step" data-step="1"><span>1</span><small>Palavras</small></div>
-      <div class="progress-step" data-step="2"><span>2</span><small>Limões</small></div>
-      <div class="progress-step" data-step="3"><span>3</span><small>Memória</small></div>
-      <div class="progress-step" data-step="4"><span>4</span><small>Gaivota</small></div>
-      <div class="progress-step" data-step="5"><span>5</span><small>Mala</small></div>
+      <div class="progress-step" data-step="1"><span>1</span><small>Mala</small></div>
+      <div class="progress-step" data-step="2"><span>2</span><small>Palavras</small></div>
+      <div class="progress-step" data-step="3"><span>3</span><small>Limões</small></div>
+      <div class="progress-step" data-step="4"><span>4</span><small>Memória</small></div>
+      <div class="progress-step" data-step="5"><span>5</span><small>Gaivota</small></div>
     </div>
   </header>
 
   <div class="game-stage" id="game-stage">
 
-    <!-- ---------- GAME 1: Word Guess ---------- -->
+    <!-- ---------- GAME 1: Pack the Bag — available Friday night ---------- -->
     <div class="game-panel" id="game-1" data-game="1">
+      <h3 class="title-with-help">
+        Faz a Mala
+        <details class="inline-help">
+          <summary aria-label="Como jogar">?</summary>
+          <p class="inline-help-panel">Arrasta apenas o que faz sentido levar para o passeio. (No telemóvel: toca no item para o colocar na mala.)</p>
+        </details>
+      </h3>
+      <div class="pack-wrap">
+        <div class="pack-scatter" id="pack-scatter">
+          <div class="pack-bag" id="pack-bag">
+            <p class="pack-bag-label">a mala</p>
+            <div class="pack-bag-items" id="pack-bag-items"></div>
+          </div>
+          <!-- item photos are injected here, scattered around the bag -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- GAME 2: Word Guess — unlocks Saturday 13:00 ---------- -->
+    <div class="game-panel" id="game-2" data-game="2">
       <h3 class="title-with-help">
         Palavra Secreta
         <details class="inline-help">
@@ -112,8 +132,8 @@
       </div>
     </div>
 
-    <!-- ---------- GAME 2: Lemon Catch ---------- -->
-    <div class="game-panel" id="game-2" data-game="2">
+    <!-- ---------- GAME 3: Lemon Catch — unlocks Saturday 13:00 ---------- -->
+    <div class="game-panel" id="game-3" data-game="3">
       <img src="stars.png" alt="" class="game-2-stars" aria-hidden="true">
       <h3 class="title-with-help">
         Apanha-Limões
@@ -132,15 +152,15 @@
       <p class="wordle-message" id="lemon-message" aria-live="polite"></p>
     </div>
 
-    <!-- ---------- GAME 3: Memory Tiles ---------- -->
-    <div class="game-panel" id="game-3" data-game="3">
+    <!-- ---------- GAME 4: Memory Tiles — unlocks Saturday 13:00 ---------- -->
+    <div class="game-panel" id="game-4" data-game="4">
       <h3>Memória Mediterrânica</h3>
       <div class="memory-grid" id="memory-grid"></div>
       <p class="wordle-message" id="memory-message" aria-live="polite"></p>
     </div>
 
-    <!-- ---------- GAME 4: Endless Runner ---------- -->
-    <div class="game-panel" id="game-4" data-game="4">
+    <!-- ---------- GAME 5: Endless Runner — unlocks Saturday 13:00 ---------- -->
+    <div class="game-panel" id="game-5" data-game="5">
       <h3 class="title-with-help">
         <img src="seagul.png" alt="" class="inline-icon"> Voo da Gaivota
         <details class="inline-help">
@@ -153,23 +173,15 @@
       <p class="wordle-message" id="runner-message" aria-live="polite"></p>
     </div>
 
-    <!-- ---------- GAME 5: Pack the Bag ---------- -->
-    <div class="game-panel" id="game-5" data-game="5">
-      <h3 class="title-with-help">
-        Faz a Mala
-        <details class="inline-help">
-          <summary aria-label="Como jogar">?</summary>
-          <p class="inline-help-panel">Arrasta apenas o que faz sentido levar para o passeio. (No telemóvel: toca no item para o colocar na mala.)</p>
-        </details>
-      </h3>
-      <div class="pack-wrap">
-        <div class="pack-scatter" id="pack-scatter">
-          <div class="pack-bag" id="pack-bag">
-            <p class="pack-bag-label">a mala</p>
-            <div class="pack-bag-items" id="pack-bag-items"></div>
-          </div>
-          <!-- item photos are injected here, scattered around the bag -->
-        </div>
+    <!-- ---------- LOCKED PLACEHOLDER — shown instead of games 2-5 until
+         Saturday 13:00, even if game 1 is already done ---------- -->
+    <div class="game-panel" id="game-locked">
+      <h3>Falta pouco&hellip;</h3>
+      <p class="game-instructions">Os próximos desafios abrem no sábado, dia 29, às 13:00.</p>
+      <div class="countdown" id="games-lock-countdown">
+        <div class="cd-box"><span class="cd-num" id="gl-hours">00</span><span class="cd-label">horas</span></div>
+        <div class="cd-box"><span class="cd-num" id="gl-mins">00</span><span class="cd-label">min</span></div>
+        <div class="cd-box"><span class="cd-num" id="gl-secs">00</span><span class="cd-label">seg</span></div>
       </div>
     </div>
 
