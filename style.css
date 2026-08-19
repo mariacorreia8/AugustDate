@@ -277,18 +277,6 @@ p { line-height: 1.6; }
 /* Wrapper crops the photo tightly into the corner — the source image has
    a lot of empty space on its right/bottom, so we clip that away instead
    of showing it as a gap between the artwork and the actual corner. */
-.sea-sticker {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: auto;
-  filter: drop-shadow(0 6px 12px rgba(28,79,107,0.25));
-  z-index: 5;
-}
-@media (max-width: 640px) {
-  .sea-sticker { width: 170px; }
-}
 
 .mc-month {
   margin: 0 0 0.9rem;
@@ -509,6 +497,25 @@ p { line-height: 1.6; }
   min-height: 1.2em;
   margin-top: 0.4rem;
 }
+
+/* Deliberately understated — a tiny, easy-to-miss link, not a visible
+   "unlock now" invitation on the landing page. */
+.password-details {
+  margin-top: 1.6rem;
+  font-size: 0.75rem;
+}
+.password-details summary {
+  cursor: pointer;
+  color: var(--ink);
+  opacity: 0.35;
+  list-style: none;
+}
+.password-details summary::-webkit-details-marker { display: none; }
+.password-details summary:hover { opacity: 0.7; }
+.password-details .password-form {
+  margin-top: 0.7rem;
+}
+.password-details .password-form input { width: auto; }
 
 /* Small inline "?" next to a game title — click to reveal how-to-play
    instructions, instead of always showing them */

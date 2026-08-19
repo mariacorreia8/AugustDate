@@ -42,6 +42,7 @@
   const STORAGE_KEYS = {
     gamesDone: 'md_games_done',      // integer 0-5, how many games completed in order
     fullyUnlocked: 'md_unlocked',    // 'true' once all 5 games are done
+    bypassLock: 'md_bypass_lock',    // 'true' once password used on landing screen
     musicOn: 'md_music_on',
     packedItems: 'md_packed_items'   // JSON array, so the packing game can restore state
   };
@@ -302,9 +303,7 @@
   function pad(n) { return String(n).padStart(2, '0'); }
 
   function isTimeUnlocked() {
-    // No password bypass here on purpose — before the reveal time, João
-    // should only ever be able to get in once the clock actually allows it.
-    return Date.now() >= unlockInstant;
+    return Date.now() >= unlockInstant || store.get(STORAGE_KEYS.bypassLock, 'false') === 'true';
   }
 
   function updateCountdown() {
@@ -346,6 +345,22 @@
       showCurrentGamePanel();
     }
   }
+
+  // Landing password form — discreet, collapsed behind "tenho uma
+  // palavra-passe". Lets you bypass the Friday-night time-lock for testing.
+  document.getElementById('landing-password-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('landing-password-input');
+    const err = document.getElementById('landing-password-error');
+    if (input.value.trim().toLowerCase() === CONFIG.password) {
+      store.set(STORAGE_KEYS.bypassLock, 'true');
+      err.textContent = '';
+      updateCountdown();
+      goToGamesOrContent();
+    } else {
+      err.textContent = 'Palavra-passe incorreta. Tenta outra vez.';
+    }
+  });
 
   // In-game password form: skips the currently active game
   document.getElementById('game-password-form').addEventListener('submit', (e) => {

@@ -51,6 +51,15 @@
     <p class="unlock-note" id="unlock-note">O resto revela-se sexta-feira ao final da tarde&hellip;</p>
 
     <button id="enter-games-btn" class="btn-primary hidden">Entrar</button>
+
+    <details class="password-details">
+      <summary>tenho uma palavra-passe</summary>
+      <form id="landing-password-form" class="password-form">
+        <input type="password" id="landing-password-input" placeholder="palavra-passe" autocomplete="off">
+        <button type="submit" class="btn-secondary">Desbloquear</button>
+      </form>
+      <p class="password-error" id="landing-password-error"></p>
+    </details>
   </div>
 
   <!-- Small decorative calendar sticker — August 2026, day 29 circled by
@@ -80,10 +89,6 @@
 <!-- SCREEN 2 — Mini-games sequence                           -->
 <!-- ======================================================= -->
 <section id="screen-games" class="screen">
-  <!-- Sea sticker, top-left — only shown here (post-unlock), never on the
-       landing page, so it doesn't hint at the surprise beforehand -->
-  <img src="sea.png" alt="" class="sea-sticker" aria-hidden="true">
-
   <header class="games-header">
     <div class="progress-track" id="progress-track">
       <div class="progress-step" data-step="1"><span>1</span><small>Mala</small></div>
