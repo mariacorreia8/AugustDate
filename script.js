@@ -1024,20 +1024,6 @@
 
   let packState = null;
 
-  // Scales the fixed 820x680 .pack-scatter box down to fit narrow screens
-  // (e.g. phones), keeping every item's relative position intact.
-  function fitPackScatter() {
-    const scatter = document.getElementById('pack-scatter');
-    const panel = document.getElementById('game-1');
-    if (!scatter || !panel) return;
-    const available = panel.clientWidth - 48; // roughly the panel's own left/right padding
-    const scale = Math.min(1, available / 820);
-    scatter.style.transform = `scale(${scale})`;
-    scatter.style.transformOrigin = 'top center';
-    scatter.parentElement.style.height = `${680 * scale}px`;
-  }
-  window.addEventListener('resize', fitPackScatter);
-
   function initPackBag() {
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
     if (done >= 1) return;
@@ -1050,54 +1036,90 @@
 
     packState = { packed: new Set() };
 
-    // Scatter every item in a ring all the way around the bag. The
-    // positions below are computed for a fixed 820x680 "virtual" canvas;
-    // fitPackScatter() scales the whole thing down with CSS transform to
-    // fit small screens, so this math never needs to change per device.
-    // Golden-angle spacing spreads items evenly without clumping; radius
-    // grows a little with each item so they fan outward.
+    // Scatter every item in an ellipse all the way around the bag, sized
+    // from the box's REAL rendered dimensions (not a fixed guess) — that's
+    // what keeps this correct on any phone. Width follows the screen;
+    // height is the fixed 640px from CSS, which is generous even on narrow
+    // phones — the ellipse leans on that extra vertical room instead of
+    // overflowing sideways. Positions are clamped at the end as a safety
+    // net so nothing can ever land outside the visible box.
     const allItems = shuffle([...CORRECT_ITEMS, ...WRONG_ITEMS]);
-    const cx = 410, cy = 340; // center of the 820x680 .pack-scatter box
-    const minRadius = 190, maxRadius = 300;
+    const itemSize = 80, half = itemSize / 2;
+    const rect = scatter.getBoundingClientRect();
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const bagHalfW = bag.offsetWidth / 2 + 30;
+    const bagHalfH = bag.offsetHeight / 2 + 30;
+    const maxRadiusX = Math.max(bagHalfW + 20, rect.width / 2 - half - 6);
+    const maxRadiusY = Math.max(bagHalfH + 20, rect.height / 2 - half - 6);
 
     allItems.forEach((item, i) => {
       const el = document.createElement('div');
       el.className = 'pack-item';
       el.innerHTML = `<img src="${item.icon}" alt="${item.label}">`;
       el.title = item.label;
-      el.draggable = true;
       el.dataset.id = item.id;
       el.dataset.correct = CORRECT_ITEMS.some(c => c.id === item.id) ? '1' : '0';
 
       const angle = i * 137.508 * (Math.PI / 180);
-      const radius = minRadius + (i / (allItems.length - 1)) * (maxRadius - minRadius) + (Math.random() * 24 - 12);
-      const x = cx + radius * Math.cos(angle) - 40;
-      const y = cy + radius * Math.sin(angle) - 40;
+      const t = i / (allItems.length - 1);
+      const radiusX = bagHalfW + t * (maxRadiusX - bagHalfW) + (Math.random() * 16 - 8);
+      const radiusY = bagHalfH + t * (maxRadiusY - bagHalfH) + (Math.random() * 16 - 8);
+      let x = cx + radiusX * Math.cos(angle) - half;
+      let y = cy + radiusY * Math.sin(angle) - half;
+      x = Math.max(0, Math.min(rect.width - itemSize, x));
+      y = Math.max(0, Math.min(rect.height - itemSize, y));
+      const rotation = (Math.random() * 16 - 8).toFixed(1);
+      el.dataset.rotation = rotation;
       el.style.left = `${x}px`;
       el.style.top = `${y}px`;
-      el.style.transform = `rotate(${(Math.random() * 16 - 8).toFixed(1)}deg)`;
+      el.style.transform = `rotate(${rotation}deg)`;
 
-      el.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', item.id);
-      });
-      // tap-to-pack for touch devices
-      el.addEventListener('click', () => tryPack(item, el));
-
+      makeDraggable(el, item);
       scatter.appendChild(el);
     });
 
-    fitPackScatter();
+    // Custom drag, driven by Pointer Events — works with mouse, touch and
+    // pen alike (HTML5's native drag-and-drop doesn't work on touch on
+    // most mobile browsers, which is why items couldn't be dragged there).
+    function makeDraggable(el, item) {
+      let startX, startY, dx, dy, moved;
 
-    bag.addEventListener('dragover', (e) => { e.preventDefault(); bag.classList.add('drag-over'); });
-    bag.addEventListener('dragleave', () => bag.classList.remove('drag-over'));
-    bag.addEventListener('drop', (e) => {
-      e.preventDefault();
-      bag.classList.remove('drag-over');
-      const id = e.dataTransfer.getData('text/plain');
-      const el = scatter.querySelector(`.pack-item[data-id="${id}"]`);
-      const item = [...CORRECT_ITEMS, ...WRONG_ITEMS].find(x => x.id === id);
-      if (el && item) tryPack(item, el, e);
-    });
+      el.addEventListener('pointerdown', (e) => {
+        if (packState.packed.has(item.id)) return;
+        e.preventDefault();
+        startX = e.clientX; startY = e.clientY;
+        dx = 0; dy = 0; moved = false;
+        el.setPointerCapture(e.pointerId);
+        el.classList.add('dragging');
+      });
+
+      el.addEventListener('pointermove', (e) => {
+        if (!el.classList.contains('dragging')) return;
+        dx = e.clientX - startX; dy = e.clientY - startY;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+        el.style.transform = `translate(${dx}px, ${dy}px) rotate(${el.dataset.rotation}deg)`;
+        const bagRect = bag.getBoundingClientRect();
+        const over = e.clientX >= bagRect.left && e.clientX <= bagRect.right &&
+          e.clientY >= bagRect.top && e.clientY <= bagRect.bottom;
+        bag.classList.toggle('drag-over', over);
+      });
+
+      el.addEventListener('pointerup', (e) => {
+        if (!el.classList.contains('dragging')) return;
+        el.classList.remove('dragging');
+        bag.classList.remove('drag-over');
+        const bagRect = bag.getBoundingClientRect();
+        const overBag = e.clientX >= bagRect.left && e.clientX <= bagRect.right &&
+          e.clientY >= bagRect.top && e.clientY <= bagRect.bottom;
+
+        if (!moved || overBag) {
+          // a tap (no movement) or a real drop on the bag — both pack it
+          tryPack(item, el, moved ? e : null);
+        }
+        // snap back to its spot if dropped outside the bag without packing
+        el.style.transform = `rotate(${el.dataset.rotation}deg)`;
+      });
+    }
 
     function tryPack(item, el, dropEvent) {
       if (packState.packed.has(item.id)) return;
