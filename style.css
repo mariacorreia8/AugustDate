@@ -1,0 +1,1161 @@
+/* =========================================================
+   Maria & João — 29 Agosto
+   Mediterranean Pinterest-style stylesheet
+   Colour palette & fonts are defined as CSS variables below —
+   feel free to tweak them without touching anything else.
+   ========================================================= */
+
+/* Titles use Singsong (self-hosted, licensed for personal use — see
+   singsong_font.zip). Falls back to the serif display stack while it loads
+   or if the file is ever missing. */
+@font-face {
+  font-family: 'Singsong';
+  src: url('Singsong.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---- palette ---- */
+  --terracotta: #e2725b;
+  --terracotta-deep: #c85a44;
+  --deep-blue: #1c4f6b;
+  --deep-blue-2: #123449;
+  --sandy: #f6ecd9;
+  --sandy-2: #efe0c2;
+  --olive: #77875a;
+  --olive-deep: #5c6a44;
+  --mustard: #e3ae3c;
+  --linen: #faf3e6;
+  --ink: #2e2a24;
+  --white: #fffdf8;
+
+  /* ---- type ---- */
+  --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-title: 'Singsong', var(--font-display);
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --radius: 18px;
+  --shadow-soft: 0 10px 30px rgba(28, 79, 107, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(227, 174, 60, 0.10), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(28, 79, 107, 0.10), transparent 45%),
+    var(--linen);
+  /* soft grain instead of directional stripes — a scatter of tiny dots
+     rather than lines, so it reads as paper/linen texture, not "racing
+     lines" */
+  background-image:
+    radial-gradient(rgba(0,0,0,0.035) 1px, transparent 1px),
+    radial-gradient(circle at 15% 10%, rgba(227, 174, 60, 0.10), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(28, 79, 107, 0.10), transparent 45%),
+    linear-gradient(var(--linen), var(--linen));
+  background-size: 5px 5px, auto, auto, auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+h1, h2, h3 { font-family: var(--font-title); margin: 0 0 0.4em; color: var(--deep-blue-2); }
+
+p { line-height: 1.6; }
+
+.hidden { display: none !important; }
+
+/* =========================================================
+   Screens
+   ========================================================= */
+.screen {
+  display: none;
+  min-height: 100vh;
+  width: 100%;
+  padding: 2.5rem 1.25rem 4rem;
+  position: relative;
+  animation: fade-in 0.8s ease;
+}
+.screen.active { display: block; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   Wavy blue line dividers, top/bottom of each screen
+   ========================================================= */
+.wave-divider {
+  height: 22px;
+  width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q 12.5 2, 25 10 T 50 10 T 75 10 T 100 10' fill='none' stroke='%231c4f6b' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 100px 20px;
+  opacity: 0.55;
+}
+.wave-divider.top { margin-bottom: 2rem; }
+.wave-divider.bottom { margin-top: 3rem; }
+
+/* =========================================================
+   Landing screen
+   ========================================================= */
+#screen-landing { text-align: center; }
+/* Landing page: everything centered, no scrolling — it should read like a
+   single still "poster" screen, not a page you scroll through. */
+#screen-landing.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  padding: 1rem 1.25rem;
+}
+.landing-inner {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--olive-deep);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+/* the landing page's eyebrow shows "Maria & João" — bigger and in the
+   title font, since it reads as a name rather than a small section label */
+.landing-inner .eyebrow {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--terracotta-deep);
+}
+.names {
+  font-size: clamp(1.8rem, 8.5vw, 4.2rem);
+  color: var(--terracotta-deep);
+  text-shadow: 0 2px 0 rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
+.names .amp { color: var(--mustard); }
+.subtitle {
+  font-size: 1.05rem;
+  color: var(--deep-blue);
+  margin-bottom: 1.5rem;
+}
+
+.olive-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 1.5rem 0;
+  color: var(--olive);
+}
+.olive-divider .line {
+  height: 1px;
+  width: 60px;
+  background: var(--olive);
+  opacity: 0.5;
+}
+.divider-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--white);
+  box-shadow: 0 0 0 2px var(--white), var(--shadow-soft);
+}
+
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 0.6rem;
+}
+.cd-box {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  min-width: 68px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(28,79,107,0.08);
+}
+.cd-num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--deep-blue);
+  font-weight: 700;
+}
+.cd-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--olive-deep);
+  margin-top: 0.2rem;
+}
+.cd-target {
+  font-size: 0.85rem;
+  color: var(--ink);
+  opacity: 0.75;
+  margin-top: 0.5rem;
+}
+/* =========================================================
+   Mini decorative calendar on the landing page
+   ========================================================= */
+.mini-calendar {
+  /* sticker taped onto the right side of the landing page */
+  position: absolute;
+  top: 130px;
+  right: 5%;
+  width: 220px;
+  z-index: 5;
+  background: rgba(63, 127, 161, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 22px;
+  padding: 1.3rem 1.2rem 1.4rem;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255,255,255,0.35);
+  /* gentle sway, like a sticker taped on and drifting a little.
+     Remove the animation line (and this keyframes block below) if you'd
+     rather have it sit still at a fixed rotate(7deg). */
+  animation: sticker-sway 5s ease-in-out infinite;
+}
+@keyframes sticker-sway {
+  0%, 100% { transform: rotate(7deg) translateY(0); }
+  50% { transform: rotate(3deg) translateY(-6px); }
+}
+@media (max-width: 640px) {
+  .mini-calendar {
+    top: 10px;
+    right: 10px;
+    width: 148px;
+    padding: 0.8rem 0.7rem 0.9rem;
+  }
+  .mini-calendar .mc-month { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .mini-calendar .mc-dow { font-size: 0.6rem; }
+  .mini-calendar .mc-day { font-size: 0.7rem; }
+  .mini-calendar .mc-grid { gap: 4px; }
+}
+
+/* Hand-drawn sun sticker (transparent PNG) */
+.sun-sticker {
+  position: absolute;
+  top: -60px;
+  left: -1%;
+  width: 320px;
+  height: auto;
+  z-index: 5;
+  animation: sticker-sway 6s ease-in-out infinite reverse;
+}
+@media (max-width: 640px) {
+  .sun-sticker {
+    top: -30px;
+    left: 4px;
+    width: 170px;
+  }
+}
+
+/* Sea sticker on the games screen, top-left corner. mix-blend-mode drops
+   the photo's plain background against the cream page background. */
+/* Wrapper crops the photo tightly into the corner — the source image has
+   a lot of empty space on its right/bottom, so we clip that away instead
+   of showing it as a gap between the artwork and the actual corner. */
+.sea-sticker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: auto;
+  filter: drop-shadow(0 6px 12px rgba(28,79,107,0.25));
+  z-index: 5;
+}
+@media (max-width: 640px) {
+  .sea-sticker { width: 170px; }
+}
+
+.mc-month {
+  margin: 0 0 0.9rem;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.mc-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 7px;
+}
+.mc-dow {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+}
+.mc-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.92);
+}
+.mc-target {
+  position: relative;
+  font-weight: 700;
+  color: var(--terracotta-deep);
+}
+/* two imperfect, differently-rotated ellipses layered together — mimics a
+   pencil that went around the date twice without lifting off the paper */
+.mc-target::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1.75px solid var(--terracotta);
+  border-radius: 55% 45% 52% 48% / 48% 55% 45% 52%;
+  transform: rotate(-9deg);
+  opacity: 0.85;
+}
+.mc-target::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 1.5px solid var(--terracotta-deep);
+  border-radius: 48% 52% 46% 54% / 54% 46% 55% 45%;
+  transform: rotate(5deg);
+  opacity: 0.7;
+}
+
+.unlock-note {
+  margin-top: 1.8rem;
+  color: var(--terracotta-deep);
+}
+.wave { display: inline-block; animation: bob 2.2s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+
+/* =========================================================
+   Photo badges — real photos (boat.jpg, sun.jpg, shell.png,
+   stars.jpg, sea.jpg) shown as soft circular "stickers" instead
+   of emoji. The photos have plain white backgrounds, so a white
+   badge behind them makes the square edges disappear.
+   ========================================================= */
+.photo-collage {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.6rem 0;
+  flex-wrap: wrap;
+}
+.collage-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--white);
+  box-shadow: var(--shadow-soft);
+  border: 3px solid var(--white);
+  animation: float-badge 5s ease-in-out infinite;
+}
+.collage-img.c1 { animation-delay: 0s; }
+.collage-img.c2 { animation-delay: 0.4s; transform: rotate(-4deg); }
+.collage-img.c3 { animation-delay: 0.8s; transform: rotate(3deg); }
+.collage-img.c4 { animation-delay: 1.2s; }
+@keyframes float-badge {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-6px) rotate(var(--r, 0deg)); }
+}
+
+/* small inline icon version, used inside headings/lists instead of emoji */
+.inline-icon {
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: -0.3em;
+  background: var(--white);
+  box-shadow: 0 0 0 2px var(--white);
+}
+/* on a dark card (e.g. the weather card) give the badge its own ring so it
+   doesn't blend into the background */
+.inline-icon.on-dark { box-shadow: 0 0 0 2px rgba(255,255,255,0.6); }
+/* multiply blend quietly drops the photo's white background so it can sit
+   directly on a coloured heading without looking like a sticker */
+.inline-icon.deco-multiply { mix-blend-mode: multiply; box-shadow: none; background: transparent; }
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.btn-primary, .btn-secondary {
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 2.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 1rem;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--terracotta), var(--mustard));
+  color: var(--white);
+  box-shadow: 0 8px 20px rgba(226,114,91,0.35);
+  margin-top: 1.6rem;
+}
+.btn-secondary {
+  background: var(--deep-blue);
+  color: var(--white);
+  box-shadow: 0 6px 16px rgba(28,79,107,0.25);
+}
+.btn-primary:hover, .btn-secondary:hover { transform: translateY(-2px); }
+.btn-primary:active, .btn-secondary:active { transform: translateY(0); }
+
+/* Made deliberately huge + pulsing: this button should ONLY be visible while
+   unlockInstantUTC in script.js is set to a test date. If you see this on
+   the live site, you forgot to put the real date back — that's the point. */
+#enter-games-btn {
+  display: block;
+  font-size: 1.6rem;
+  padding: 1.4rem 3rem;
+  margin: 2rem auto 0;
+  animation: pulse-big 1.4s ease-in-out infinite;
+}
+@keyframes pulse-big {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* =========================================================
+   Floating help button (bottom-right, fixed) — opens the
+   backup-password form to skip whichever game is active
+   ========================================================= */
+.help-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 500;
+}
+.help-fab summary {
+  list-style: none;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--deep-blue);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s;
+}
+.help-fab summary::-webkit-details-marker { display: none; }
+.help-fab summary::marker { content: ""; }
+.help-fab summary:hover { transform: scale(1.07); }
+.help-panel {
+  position: absolute;
+  bottom: 62px;
+  right: 0;
+  width: 230px;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+.help-title {
+  margin: 0 0 0.7rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--deep-blue-2);
+}
+.password-form {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.password-form input {
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(28,79,107,0.2);
+  background: var(--white);
+  font-family: var(--font-body);
+  width: 100%;
+}
+.password-error {
+  color: var(--terracotta-deep);
+  font-size: 0.8rem;
+  min-height: 1.2em;
+  margin-top: 0.4rem;
+}
+
+/* Small inline "?" next to a game title — click to reveal how-to-play
+   instructions, instead of always showing them */
+.title-with-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.inline-help { position: relative; display: inline-block; }
+.inline-help summary {
+  list-style: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--olive);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.inline-help summary::-webkit-details-marker { display: none; }
+.inline-help summary::marker { content: ""; }
+.inline-help-panel {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--deep-blue);
+  text-align: left;
+  margin: 0;
+  z-index: 20;
+}
+
+/* =========================================================
+   Music toggle
+   ========================================================= */
+.music-toggle {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 500;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: var(--white);
+  box-shadow: var(--shadow-soft);
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+.music-toggle:hover { transform: scale(1.08); }
+.music-toggle.muted { opacity: 0.45; }
+
+/* TESTING ONLY — delete this whole block (and the button in index.html)
+   before sending the link to João */
+.reset-progress-btn {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  z-index: 500;
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  background: rgba(28,79,107,0.75);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+.reset-progress-btn:hover { opacity: 1; }
+
+/* =========================================================
+   Floating decorations + sparkle canvas
+   ========================================================= */
+#sparkle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 600;
+  display: none;
+}
+#sparkle-canvas.active { display: block; }
+
+/* keep real content above decoration layer */
+.screen { position: relative; z-index: 2; }
+
+/* =========================================================
+   Games screen
+   ========================================================= */
+.games-header { text-align: center; max-width: 640px; margin: 0 auto 2rem; }
+
+.progress-track {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1.2rem;
+}
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+.progress-step span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--olive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--olive-deep);
+}
+.progress-step small { font-size: 0.65rem; margin-top: 0.25rem; color: var(--olive-deep); }
+.progress-step.active { opacity: 1; }
+.progress-step.done span { background: var(--olive); color: var(--white); }
+.progress-step.done span::after { content: "✓"; }
+.progress-step.done span { font-size: 0; }
+.progress-step.done span::after { font-size: 1rem; }
+
+.game-stage { max-width: 880px; margin: 0 auto; }
+/* Word-guess game gets more breathing room since its grid+keyboard sit
+   side by side and were feeling cramped in the shared narrower stage */
+#game-1 { max-width: none; }
+.game-panel {
+  position: relative;
+  display: none;
+  background: var(--white);
+  border-radius: 24px;
+  padding: 1.6rem 1.4rem 2rem;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  animation: fade-in 0.5s ease;
+}
+.game-2-stars {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 64px;
+  height: auto;
+  transform: rotate(8deg);
+}
+@media (max-width: 480px) {
+  .game-2-stars { width: 44px; top: 10px; right: 10px; }
+}
+.game-panel.active { display: block; }
+.game-instructions { color: var(--deep-blue); opacity: 0.85; font-size: 0.92rem; margin-bottom: 1.2rem; }
+.wordle-message { min-height: 1.4em; font-weight: 600; color: var(--terracotta-deep); margin: 0.8rem 0; }
+
+/* Wordle-style game — grid on the left, keyboard on the right */
+.wordle-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.wordle-grid {
+  display: grid;
+  grid-template-rows: repeat(8, 1fr);
+  gap: 8px;
+  width: min(360px, 80vw);
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+.wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.wordle-tile {
+  aspect-ratio: 1;
+  border: 2px solid rgba(28,79,107,0.25);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  color: var(--deep-blue-2);
+  background: var(--sandy);
+  transition: transform 0.15s;
+}
+.wordle-tile.pop { transform: scale(1.12); }
+.wordle-tile.correct { background: var(--olive); border-color: var(--olive); color: var(--white); }
+.wordle-tile.present { background: var(--mustard); border-color: var(--mustard); color: var(--white); }
+.wordle-tile.absent { background: #cfc6b4; border-color: #cfc6b4; color: var(--white); }
+
+.wordle-keyboard { display: flex; flex-direction: column; gap: 8px; align-items: center; padding-top: 0.4rem; }
+.wk-row { display: flex; gap: 6px; }
+.wk-key {
+  padding: 0.8rem 0.65rem;
+  min-width: 36px;
+  border: none;
+  border-radius: 8px;
+  background: var(--sandy-2);
+  color: var(--deep-blue-2);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.wk-key.wide { min-width: 62px; font-size: 0.78rem; }
+.wk-key.correct { background: var(--olive); color: var(--white); }
+.wk-key.present { background: var(--mustard); color: var(--white); }
+.wk-key.absent { background: #b9b0a0; color: var(--white); }
+
+/* Lemon catch & runner canvas — soft pastel wash instead of a strong blue */
+#lemon-canvas, #runner-canvas {
+  background: linear-gradient(180deg, #eef8f6 0%, #bfe0da 55%, #9dd0d6 100%);
+  border-radius: 14px;
+  max-width: 100%;
+  touch-action: none;
+  cursor: pointer;
+}
+/* sandy "porthole" frame the canvas sits inside, tying it back into the
+   site's palette instead of the blue floating on plain white */
+.lemon-arena {
+  display: inline-block;
+  background: var(--sandy);
+  border-radius: 26px;
+  padding: 12px;
+  margin: 0 auto 1rem;
+  box-shadow: inset 0 0 0 1px rgba(28,79,107,0.08), var(--shadow-soft);
+}
+.lemon-hud {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.lemon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--white);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  box-shadow: var(--shadow-soft);
+  font-size: 1.05rem;
+  color: var(--deep-blue-2);
+  font-weight: 600;
+}
+.lemon-chip small { font-weight: 500; opacity: 0.6; font-size: 0.8rem; }
+
+/* Memory game */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.memory-card {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  cursor: pointer;
+  perspective: 600px;
+}
+.memory-card-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.4s;
+}
+.memory-card.flipped .memory-card-inner,
+.memory-card.matched .memory-card-inner { transform: rotateY(180deg); }
+.memory-face {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  backface-visibility: hidden;
+  font-size: 1.5rem;
+}
+.memory-face.back { background: var(--deep-blue); color: var(--mustard); }
+.memory-face.front { background: var(--sandy); transform: rotateY(180deg); }
+.memory-card.matched .memory-face.front { background: var(--olive); }
+/* medallion showing shell.png on the card back, like a little wax seal */
+.memory-back-medallion {
+  width: 62%;
+  height: 62%;
+  border-radius: 50%;
+  background: var(--sandy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.5);
+}
+.memory-back-medallion img { width: 78%; height: 78%; object-fit: cover; border-radius: 50%; }
+.memory-face.front img.memory-icon-img { width: 72%; height: 72%; object-fit: contain; }
+
+/* Pack the bag — a fixed, generous desktop-only canvas: the bag sits dead
+   center and items are scattered all the way around it (see initPackBag in
+   script.js for the actual placement math). */
+.pack-wrap { display: flex; justify-content: center; }
+.pack-scatter {
+  position: relative;
+  width: 820px;
+  height: 680px;
+}
+/* items are just the photos themselves — no card/box around them, no
+   text/emoji. The label lives in the alt/title attribute for accessibility
+   only, and as a drop shadow so the cutout still reads against the page. */
+.pack-item {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.15s, opacity 0.2s;
+}
+.pack-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(28,79,107,0.25));
+}
+.pack-item:hover { transform: scale(1.12) !important; z-index: 10; }
+.pack-item:active { cursor: grabbing; }
+.pack-item.wrong-shake { animation: shake 0.4s; }
+@keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+.pack-bag {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 260px;
+  height: 240px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  border: 3px dashed var(--olive);
+  border-radius: 18px;
+  padding: 1rem;
+  background: var(--linen);
+  box-shadow: var(--shadow-soft);
+}
+.pack-bag.drag-over { background: rgba(119,135,90,0.16); }
+.pack-bag-label { flex: 0 0 auto; margin: 0 0 0.6rem; font-weight: 700; color: var(--olive-deep); text-align: center; }
+/* items land exactly where they're dropped (see initPackBag in script.js)
+   instead of flowing into a tidy row */
+.pack-bag-items { position: relative; flex: 1 1 auto; min-height: 0; }
+.pack-bag-items .pack-item { width: 60px; height: 60px; }
+
+/* =========================================================
+   Game result notification (reusable across games)
+   ========================================================= */
+.game-notice {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 850;
+}
+.game-notice.active {
+  display: flex;
+  animation: notice-pop 0.35s ease;
+}
+.game-notice-card {
+  background: rgba(28, 79, 107, 0.9);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 1.8rem 2.4rem;
+  border-radius: 28px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  max-width: 320px;
+}
+.game-notice-title {
+  color: var(--white);
+  font-family: var(--font-title);
+  font-size: 1.9rem;
+  margin: 0;
+}
+.game-notice-subtitle {
+  color: rgba(255,255,255,0.85);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0;
+}
+.game-notice-subtitle + .game-notice-btn { margin-top: 1.4rem; }
+.game-notice-title + .game-notice-btn { margin-top: 1.2rem; }
+.game-notice-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 2.1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  background: var(--white);
+  color: var(--deep-blue-2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+.game-notice-btn:hover { transform: translateY(-2px); }
+.game-notice-btn:active { transform: translateY(0); }
+@keyframes notice-pop {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Small auto-dismissing toast — brief warnings ("wrong item"), unlike the
+   blocking .game-notice popup which needs a click to go away */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  z-index: 950;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast p {
+  margin: 0;
+  background: var(--terracotta-deep);
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+  max-width: 80vw;
+}
+
+/* =========================================================
+   Reveal transition
+   ========================================================= */
+.reveal-overlay {
+  position: fixed; inset: 0;
+  display: none;
+  align-items: center; justify-content: center;
+  background: radial-gradient(circle, var(--mustard), var(--terracotta) 70%);
+  z-index: 900;
+  text-align: center;
+  color: var(--white);
+}
+.reveal-overlay.active { display: flex; animation: reveal-fade 2.6s ease forwards; }
+@keyframes reveal-fade {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+.reveal-icons { display: flex; justify-content: center; gap: 0.8rem; }
+.reveal-icons img { width: 52px; height: 52px; object-fit: cover; border-radius: 50%; background: var(--white); box-shadow: 0 0 0 3px var(--white); }
+.reveal-content h2 { color: var(--white); font-size: 2.2rem; }
+
+/* =========================================================
+   Content screen
+   ========================================================= */
+.content-block {
+  max-width: 680px;
+  margin: 0 auto 3rem;
+}
+.content-block.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 760px;
+}
+@media (max-width: 640px) {
+  .content-block.two-col { grid-template-columns: 1fr; }
+}
+.section-intro { color: var(--deep-blue); opacity: 0.8; }
+
+.note-paper {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ink);
+  position: relative;
+}
+.note-paper::before {
+  content: "";
+  position: absolute; top: 0; left: 2rem; right: 2rem; height: 3px;
+  background: repeating-linear-gradient(90deg, var(--terracotta), var(--terracotta) 8px, transparent 8px, transparent 16px);
+  border-radius: 2px;
+}
+.signature { text-align: right; color: var(--terracotta-deep); margin-top: 1rem; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 3.6rem; }
+.timeline::before {
+  content: "";
+  position: absolute; left: 28px; top: 6px; bottom: 6px;
+  width: 2px;
+  background: repeating-linear-gradient(180deg, var(--olive), var(--olive) 6px, transparent 6px, transparent 12px);
+}
+.timeline-item { position: relative; margin-bottom: 1.1rem; }
+/* just the sticker itself, bigger, no circle badge behind it */
+.tl-dot {
+  position: absolute; left: -3.6rem; top: -6px;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tl-dot img.inline-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(28,79,107,0.3));
+}
+.tl-body {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+.tl-body h3 { font-family: var(--font-body); font-size: 1.02rem; font-weight: 700; margin-bottom: 0.15rem; }
+.tl-preview { margin: 0; color: var(--olive-deep); font-size: 0.85rem; }
+.tl-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, margin-top 0.35s ease;
+  margin-top: 0;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.timeline-item.open .tl-details { max-height: 220px; margin-top: 0.7rem; }
+.map-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--deep-blue);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--deep-blue);
+}
+
+/* Packing list */
+/* just the photos, no boxes/labels — matches the Pack the Bag game */
+.packing-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.4rem;
+}
+.packing-list img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(28,79,107,0.2));
+}
+
+.bullet-list { list-style: none; padding: 0; }
+.bullet-list li { margin-bottom: 0.6rem; }
+
+.weather-card {
+  background: var(--deep-blue);
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+}
+.weather-card p { margin: 0.4rem 0; }
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+.fact-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+  font-size: 0.9rem;
+  border-left: 4px solid var(--mustard);
+}
+
+.berlengas-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+.berlengas-gallery img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: var(--shadow-soft);
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+.berlengas-gallery img:hover { transform: scale(1.03); }
+
+/* Lightbox — click a Berlengas photo to see it full-size */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 52, 73, 0.92);
+  z-index: 970;
+  cursor: zoom-out;
+  padding: 2rem;
+}
+.lightbox.active { display: flex; animation: notice-pop 0.2s ease; }
+.lightbox img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.closing { text-align: center; }
+.closing-text { font-family: var(--font-display); font-size: 1.3rem; color: var(--deep-blue-2); max-width: 520px; margin: 0 auto; }
+.closing-names { margin-top: 1rem; font-size: 1.4rem; color: var(--terracotta-deep); font-family: var(--font-display); }
+
+/* =========================================================
+   Responsive tweaks
+   ========================================================= */
+@media (max-width: 420px) {
+  .cd-box { min-width: 58px; padding: 0.7rem 0.6rem; }
+  .cd-num { font-size: 1.4rem; }
+  .names { font-size: 1.65rem; }
+}

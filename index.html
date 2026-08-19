@@ -1,0 +1,377 @@
+ <!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>João &amp; Maria – 29 Agosto</title>
+<meta name="description" content="Uma surpresa para o João. Falta pouco&hellip;">
+
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ======================================================= -->
+<!-- Sparkle canvas — used only for the reveal-moment burst    -->
+<!-- ======================================================= -->
+<canvas id="sparkle-canvas" aria-hidden="true"></canvas>
+
+<!-- ======================================================= -->
+<!-- Music toggle — always visible, top corner                -->
+<!-- ======================================================= -->
+<button id="music-toggle" class="music-toggle" title="Música ambiente" aria-label="Ligar/desligar música">
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+    <path d="M16.5 8.5a5 5 0 010 7" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<!-- ======================================================= -->
+<!-- Reset button — TESTING ONLY, remove before sharing the    -->
+<!-- link with João. Clears game progress so you can replay.   -->
+<!-- ======================================================= -->
+<button id="reset-progress-btn" class="reset-progress-btn" title="Reiniciar progresso dos jogos (só para testes)">↺ Reiniciar jogos</button>
+
+<!-- ======================================================= -->
+<!-- SCREEN 1 — Landing / countdown lock                       -->
+<!-- ======================================================= -->
+<section id="screen-landing" class="screen active">
+  <div class="wave-divider top" aria-hidden="true"></div>
+
+  <div class="landing-inner">
+    <p class="eyebrow">João &amp; Maria</p>
+    <h1 class="names">Date de Agosto</h1>
+
+    <div class="countdown" id="countdown" role="timer" aria-live="polite">
+      <div class="cd-box"><span class="cd-num" id="cd-days">00</span><span class="cd-label">dias</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-hours">00</span><span class="cd-label">horas</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-mins">00</span><span class="cd-label">min</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-secs">00</span><span class="cd-label">seg</span></div>
+    </div>
+    <p class="unlock-note" id="unlock-note">O resto revela-se sexta-feira ao final da tarde&hellip;</p>
+
+    <button id="enter-games-btn" class="btn-primary hidden">Entrar</button>
+  </div>
+
+  <!-- Small decorative calendar sticker — August 2026, day 29 circled by
+       hand. Positioned absolutely on the right, like a sticker taped onto
+       the page. Edit the mc-day spans below if the date ever needs to
+       change; Aug 1 2026 falls on a Saturday, hence the 6 leading blanks. -->
+  <div class="mini-calendar" aria-hidden="true">
+    <p class="mc-month">Agosto</p>
+    <div class="mc-grid">
+      <span class="mc-dow">D</span><span class="mc-dow">S</span><span class="mc-dow">T</span><span class="mc-dow">Q</span><span class="mc-dow">Q</span><span class="mc-dow">S</span><span class="mc-dow">S</span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span class="mc-day">1</span>
+      <span class="mc-day">2</span><span class="mc-day">3</span><span class="mc-day">4</span><span class="mc-day">5</span><span class="mc-day">6</span><span class="mc-day">7</span><span class="mc-day">8</span>
+      <span class="mc-day">9</span><span class="mc-day">10</span><span class="mc-day">11</span><span class="mc-day">12</span><span class="mc-day">13</span><span class="mc-day">14</span><span class="mc-day">15</span>
+      <span class="mc-day">16</span><span class="mc-day">17</span><span class="mc-day">18</span><span class="mc-day">19</span><span class="mc-day">20</span><span class="mc-day">21</span><span class="mc-day">22</span>
+      <span class="mc-day">23</span><span class="mc-day">24</span><span class="mc-day">25</span><span class="mc-day">26</span><span class="mc-day">27</span><span class="mc-day">28</span><span class="mc-day mc-target">29</span>
+      <span class="mc-day">30</span><span class="mc-day">31</span>
+    </div>
+  </div>
+
+  <!-- Little hand-drawn sun sticker on the left, balancing the calendar -->
+  <img src="sundraw.png" alt="" class="sun-sticker" aria-hidden="true">
+
+  <div class="wave-divider bottom" aria-hidden="true"></div>
+</section>
+
+<!-- ======================================================= -->
+<!-- SCREEN 2 — Mini-games sequence                           -->
+<!-- ======================================================= -->
+<section id="screen-games" class="screen">
+  <!-- Sea sticker, top-left — only shown here (post-unlock), never on the
+       landing page, so it doesn't hint at the surprise beforehand -->
+  <img src="sea.png" alt="" class="sea-sticker" aria-hidden="true">
+
+  <header class="games-header">
+    <div class="progress-track" id="progress-track">
+      <div class="progress-step" data-step="1"><span>1</span><small>Palavras</small></div>
+      <div class="progress-step" data-step="2"><span>2</span><small>Limões</small></div>
+      <div class="progress-step" data-step="3"><span>3</span><small>Memória</small></div>
+      <div class="progress-step" data-step="4"><span>4</span><small>Gaivota</small></div>
+      <div class="progress-step" data-step="5"><span>5</span><small>Mala</small></div>
+    </div>
+  </header>
+
+  <div class="game-stage" id="game-stage">
+
+    <!-- ---------- GAME 1: Word Guess ---------- -->
+    <div class="game-panel" id="game-1" data-game="1">
+      <h3 class="title-with-help">
+        Palavra Secreta
+        <details class="inline-help">
+          <summary aria-label="Como jogar">?</summary>
+          <p class="inline-help-panel">Adivinha a palavra de 5 letras em 8 tentativas.</p>
+        </details>
+      </h3>
+      <p class="wordle-message" id="wordle-message" aria-live="polite"></p>
+      <div class="wordle-layout">
+        <div class="wordle-grid" id="wordle-grid"></div>
+        <div class="wordle-keyboard" id="wordle-keyboard"></div>
+      </div>
+    </div>
+
+    <!-- ---------- GAME 2: Lemon Catch ---------- -->
+    <div class="game-panel" id="game-2" data-game="2">
+      <img src="stars.png" alt="" class="game-2-stars" aria-hidden="true">
+      <h3 class="title-with-help">
+        Apanha-Limões
+        <details class="inline-help">
+          <summary aria-label="Como jogar">?</summary>
+          <p class="inline-help-panel">Move o barco e apanha 20 limões. Cuidado com os caranguejos.</p>
+        </details>
+      </h3>
+      <div class="lemon-hud">
+        <span class="lemon-chip"><img src="lemon.png" alt="" class="inline-icon"> <b id="lemon-score">0</b><small>/20</small></span>
+        <span class="lemon-chip"><img src="carangueijo.png" alt="" class="inline-icon"> <b id="rock-score">0</b><small>/5</small></span>
+      </div>
+      <div class="lemon-arena">
+        <canvas id="lemon-canvas" width="460" height="560"></canvas>
+      </div>
+      <p class="wordle-message" id="lemon-message" aria-live="polite"></p>
+    </div>
+
+    <!-- ---------- GAME 3: Memory Tiles ---------- -->
+    <div class="game-panel" id="game-3" data-game="3">
+      <h3>Memória Mediterrânica</h3>
+      <div class="memory-grid" id="memory-grid"></div>
+      <p class="wordle-message" id="memory-message" aria-live="polite"></p>
+    </div>
+
+    <!-- ---------- GAME 4: Endless Runner ---------- -->
+    <div class="game-panel" id="game-4" data-game="4">
+      <h3 class="title-with-help">
+        <img src="seagul.png" alt="" class="inline-icon"> Voo da Gaivota
+        <details class="inline-help">
+          <summary aria-label="Como jogar">?</summary>
+          <p class="inline-help-panel">Toca ou carrega em espaço para voar. Só precisas de apanhar um bocadinho de corações — evita os caranguejos.</p>
+        </details>
+      </h3>
+      <div class="lemon-hud"><span class="lemon-chip"><img src="redheart.png" alt="" class="inline-icon"> <b id="runner-score">0</b><small>/8</small></span></div>
+      <canvas id="runner-canvas" width="360" height="360"></canvas>
+      <p class="wordle-message" id="runner-message" aria-live="polite"></p>
+    </div>
+
+    <!-- ---------- GAME 5: Pack the Bag ---------- -->
+    <div class="game-panel" id="game-5" data-game="5">
+      <h3 class="title-with-help">
+        Faz a Mala
+        <details class="inline-help">
+          <summary aria-label="Como jogar">?</summary>
+          <p class="inline-help-panel">Arrasta apenas o que faz sentido levar para o passeio. (No telemóvel: toca no item para o colocar na mala.)</p>
+        </details>
+      </h3>
+      <div class="pack-wrap">
+        <div class="pack-scatter" id="pack-scatter">
+          <div class="pack-bag" id="pack-bag">
+            <p class="pack-bag-label">a mala</p>
+            <div class="pack-bag-items" id="pack-bag-items"></div>
+          </div>
+          <!-- item photos are injected here, scattered around the bag -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Floating help button, fixed to the bottom-right of the screen while
+       any game is active. Opens the password (skip-this-game) form. -->
+  <details class="help-fab" id="game-help-fab">
+    <summary aria-label="Precisas de ajuda?">?</summary>
+    <div class="help-panel">
+      <p class="help-title">Precisas de ajuda?</p>
+      <form id="game-password-form" class="password-form">
+        <input type="password" id="game-password-input" placeholder="palavra-passe" autocomplete="off">
+        <button type="submit" class="btn-secondary">Saltar este jogo</button>
+      </form>
+      <p class="password-error" id="game-password-error"></p>
+    </div>
+  </details>
+</section>
+
+<!-- ======================================================= -->
+<!-- Game result notification — reusable popup shown when a    -->
+<!-- game is won/finished, with a button to move on             -->
+<!-- ======================================================= -->
+<div class="game-notice" id="game-notice">
+  <div class="game-notice-card">
+    <p class="game-notice-title" id="game-notice-title"></p>
+    <p class="game-notice-subtitle hidden" id="game-notice-subtitle"></p>
+    <button class="game-notice-btn" id="game-notice-btn">Próximo desafio</button>
+  </div>
+</div>
+
+<!-- Small toast notification — brief, auto-dismissing messages like
+     "wrong item" warnings, as opposed to the blocking game-notice popup -->
+<div class="toast" id="toast"><p id="toast-text"></p></div>
+
+<!-- Lightbox — click any Berlengas photo to see it bigger, click again to close -->
+<div class="lightbox" id="lightbox">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- ======================================================= -->
+<!-- Reveal transition overlay                                 -->
+<!-- ======================================================= -->
+<div id="reveal-overlay" class="reveal-overlay">
+  <div class="reveal-content">
+    <p class="reveal-icons">
+      <img src="lemon.png" alt="" class="inline-icon">
+      <img src="sea.png" alt="" class="inline-icon">
+      <img src="olive.png" alt="" class="inline-icon">
+    </p>
+    <h2>Está tudo pronto!</h2>
+    <p>29 de Agosto espera por nós&hellip;</p>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- SCREEN 3 — Unlocked content                               -->
+<!-- ======================================================= -->
+<section id="screen-content" class="screen">
+  <div class="wave-divider top" aria-hidden="true"></div>
+
+  <!-- 2. Itinerary -->
+  <article class="content-block">
+    <p class="eyebrow">o plano do dia</p>
+    <h2>Itinerário</h2>
+    <p class="section-intro">Toca em cada momento para abrir os detalhes.</p>
+
+    <div class="timeline" id="timeline">
+      <!-- items injected/enhanced by JS, base markup below for no-JS fallback -->
+      <div class="timeline-item" data-time="13:00">
+        <div class="tl-dot"><img src="house.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>13:00 — Saímos de casa</h3>
+          <div class="tl-details">
+            <a class="map-link" href="https://www.google.com/maps/dir/?api=1&destination=39.3532404,-9.3786521" target="_blank" rel="noopener">Abrir no Google Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="14:15">
+        <div class="tl-dot"><img src="ancor.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>~14:15 — Chegada à Marina de Peniche</h3>
+          <p class="tl-preview">Cais da Ribeira</p>
+          <div class="tl-details">
+            <p>Temos que procurar três casas no topo de uma plataforma de madeira. É aqui que se situam os escritórios da "Feeling Berlenga", com quem vamos fazer as nossas atividades do dia. Os funcionários da Feeling Berlenga estarão a usar uma t-shirt azul-clara ou uma camisola azul-escura. Temos que estar lá às 14:15, mas só vamos começar às 14:45.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="14:45">
+        <div class="tl-dot"><img src="boat.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>14:45 — Partida do barco</h3>
+          <p class="tl-preview">Rumo às Berlengas !!</p>
+          <div class="tl-details">
+            <p>Vamos fazer uma viagem de barco até às Berlengas em Peniche. Se quiseres saber mais, continua a ler — lá em baixo deixei algumas fotos e factos sobre as Berlengas.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="~15:15">
+        <div class="tl-dot"><img src="island.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>Na ilha — Praia do Carreiro do Mosteiro</h3>
+          <p class="tl-preview">Banhos, sol e água cristalina</p>
+          <div class="tl-details">
+            <p>O plano principal é mesmo este: mergulhar naquela água azul-turquesa e não fazer mais nada além de existir ao sol.</p>
+            <a class="map-link" href="https://maps.google.com/?q=Praia+do+Carreiro+do+Mosteiro,+Berlengas" target="_blank" rel="noopener">Abrir no Google Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="18:45">
+        <div class="tl-dot"><img src="boat.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>~18:45 — Regresso a Peniche</h3>
+          <p class="tl-preview">De volta ao continente</p>
+          <div class="tl-details">
+            <p>Voltamos de barco para Peniche — leva um casaco leve, o regresso costuma ser mais fresco e ventoso.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="19:00">
+        <div class="tl-dot"><img src="sea.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>Passeio romântico em Peniche</h3>
+          <p class="tl-preview">Marina, centro histórico e forte — se der tempo</p>
+          <div class="tl-details">
+            <p>Um passeio calmo pela marina e pela zona histórica, com a Fortaleza de Peniche como pano de fundo, se ainda houver tempo antes do jantar.</p>
+            <a class="map-link" href="https://maps.google.com/?q=Fortaleza+de+Peniche" target="_blank" rel="noopener">Abrir no Google Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="19:30">
+        <div class="tl-dot"><img src="wine.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>19:30 / 20:00 — Jantar</h3>
+          <p class="tl-preview">Restaurante Profresco, Peniche</p>
+          <div class="tl-details">
+            <p>Jantar tranquilo no Profresco, para fechar o dia com boa comida e ainda melhor companhia.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-time="tarde">
+        <div class="tl-dot"><img src="Honda.png" alt="" class="inline-icon"></div>
+        <div class="tl-body">
+          <h3>Depois do jantar — regresso a casa</h3>
+          <p class="tl-preview">Fim do dia perfeito</p>
+          <div class="tl-details">
+            <p>De carro até casa, provavelmente cansados, cheirando a sal e felizes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 3. Packing list -->
+  <article class="content-block">
+    <p class="eyebrow">o que levar</p>
+    <h2>Não te esqueças do que levar</h2>
+    <div class="packing-list" id="packing-list-final"><!-- injected by JS --></div>
+  </article>
+
+  <!-- 4. Weather -->
+  <article class="content-block">
+    <p class="eyebrow">previsão</p>
+    <h2>Tempo</h2>
+    <div class="weather-card">
+      <p><img src="sun.png" alt="" class="inline-icon on-dark"> Dias quentes: <b>23–26°C</b></p>
+      <p>Noites mais frescas</p>
+      <p><img src="sea.png" alt="" class="inline-icon on-dark"> Mar a <b>18–19°C</b> — refrescante!</p>
+      <p>Leva um casaco leve para o regresso do barco e para a noite.</p>
+    </div>
+  </article>
+
+  <!-- 6. Fun facts -->
+  <article class="content-block">
+    <p class="eyebrow">curiosidades</p>
+    <h2><img src="stars.png" alt="" class="inline-icon"> Sobre as Berlengas</h2>
+    <div class="facts-grid">
+      <div class="fact-card">São Reserva da Biosfera pela UNESCO desde 2011.</div>
+      <div class="fact-card">O granito rosa das rochas é único na costa portuguesa.</div>
+      <div class="fact-card">O Forte de São João Baptista, do séc. XVII, já foi mosteiro e prisão.</div>
+      <div class="fact-card">A água é tão transparente que parece o Mediterrâneo.</div>
+      <div class="fact-card">O número de visitantes por dia é limitado, para proteger a ilha.</div>
+      <div class="fact-card"><img src="seagul.png" alt="" class="inline-icon"> É um santuário de aves marinhas raras, como o corvo-marinho-de-crista.</div>
+    </div>
+
+    <!-- filled in by JS from the BERLENGAS_PHOTOS list in script.js, in a
+         shuffled order — add more photos there, not here -->
+    <div class="berlengas-gallery" id="berlengas-gallery"></div>
+  </article>
+
+  <div class="wave-divider bottom" aria-hidden="true"></div>
+</section>
+
+<!-- Hidden audio elements: procedurally generated via Web Audio API in script.js -->
+<script src="script.js"></script>
+</body>
+</html>
