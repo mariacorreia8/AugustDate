@@ -127,7 +127,14 @@
       </h3>
       <p class="wordle-message" id="wordle-message" aria-live="polite"></p>
       <div class="wordle-layout">
-        <div class="wordle-grid" id="wordle-grid"></div>
+        <div class="wordle-grid-wrap">
+          <div class="wordle-grid" id="wordle-grid"></div>
+          <!-- invisible, sits over the grid — tapping it opens the phone's
+               native keyboard. The on-screen keyboard below still works too. -->
+          <input type="text" id="wordle-mobile-input" class="wordle-mobile-input"
+                 autocomplete="off" autocapitalize="characters" autocorrect="off"
+                 spellcheck="false" maxlength="1" inputmode="text" aria-hidden="true" tabindex="-1">
+        </div>
         <div class="wordle-keyboard" id="wordle-keyboard"></div>
       </div>
     </div>

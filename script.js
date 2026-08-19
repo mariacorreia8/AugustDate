@@ -520,18 +520,35 @@
 
     document.addEventListener('keydown', wordleKeyListener);
 
+    // Invisible input overlaying the grid — tapping it opens the phone's
+    // own keyboard. Typed letters come through 'input' (works even on
+    // keyboards that don't fire keydown for letters, like iOS Safari);
+    // Enter/Backspace come through 'keydown' on the input itself.
+    const mobileInput = document.getElementById('wordle-mobile-input');
+    mobileInput.value = '';
+    mobileInput.oninput = () => {
+      const ch = mobileInput.value.slice(-1).toUpperCase();
+      mobileInput.value = '';
+      if (/^[A-ZÇ]$/.test(ch)) handleWordleKey(ch);
+    };
+    mobileInput.onkeydown = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); handleWordleKey('ENTER'); }
+      else if (e.key === 'Backspace') { e.preventDefault(); handleWordleKey('⌫'); }
+    };
+
     showGameNotice({
       title: 'Palavra Secreta',
       subtitle: 'Adivinha a palavra de 5 letras em 8 tentativas.',
       btnLabel: 'Começar',
-      onNext: () => {}
+      onNext: () => { mobileInput.focus(); }
     });
   }
 
   function wordleKeyListener(e) {
-    const panel = document.getElementById('game-1');
+    const panel = document.getElementById('game-2');
     if (!panel.classList.contains('active') || !wordleState || wordleState.finished) return;
     if (document.getElementById('game-notice').classList.contains('active')) return;
+    if (e.target && e.target.id === 'wordle-mobile-input') return; // handled separately
     if (e.key === 'Enter') handleWordleKey('ENTER');
     else if (e.key === 'Backspace') handleWordleKey('⌫');
     else if (/^[a-zA-Zç]$/.test(e.key)) handleWordleKey(e.key.toUpperCase());

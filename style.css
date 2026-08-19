@@ -689,13 +689,23 @@ p { line-height: 1.6; }
   gap: 3rem;
   flex-wrap: wrap;
 }
+.wordle-grid-wrap { position: relative; width: min(360px, 80vw); flex-shrink: 0; margin: 0 auto; }
 .wordle-grid {
   display: grid;
   grid-template-rows: repeat(8, 1fr);
   gap: 8px;
-  width: min(360px, 80vw);
-  flex-shrink: 0;
-  margin: 0 auto;
+}
+/* invisible tap target over the grid that pops up the phone's own keyboard */
+.wordle-mobile-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  font-size: 16px; /* keeps iOS Safari from zooming in on focus */
+  cursor: default;
 }
 .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .wordle-tile {
