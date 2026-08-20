@@ -22,11 +22,8 @@
        Sábado 29 Ago 2026, 13:00 Lisboa -> 12:00 UTC
      ======================================================================= */
   const CONFIG = {
-    // TESTE TEMPORÁRIO: data movida para o passado para conseguires ver o
-    // que aparece a partir de sexta sem precisar da palavra-passe.
-    // >>> ANTES DE PUBLICAR, REPÕE A LINHA ORIGINAL: '2026-08-28T18:30:00Z' <<<
-    unlockInstantUTC: '2026-08-15T00:00:00Z', // games become available from this moment
-    countdownTargetUTC: '2026-08-29T12:00:00Z', // "we leave home" moment shown on landing
+    unlockInstantUTC: '2026-08-28T19:00:00Z', // Friday 20:00 Lisbon — landing "Entrar" button unlocks
+    countdownTargetUTC: '2026-08-29T12:00:00Z', // Saturday 13:00 Lisbon — rest of the games unlock
     password: 'catupiry' // case-insensitive, checked lowercased
   };
 
