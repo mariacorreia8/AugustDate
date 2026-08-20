@@ -1067,9 +1067,9 @@
     // overflowing sideways. Positions are clamped at the end as a safety
     // net so nothing can ever land outside the visible box.
     const allItems = shuffle([...CORRECT_ITEMS, ...WRONG_ITEMS]);
-    const itemSize = 80, half = itemSize / 2;
-    const rect = scatter.getBoundingClientRect();
-    const cx = rect.width / 2, cy = rect.height / 2;
+    let itemSize = 80, half = itemSize / 2;
+    let rect = scatter.getBoundingClientRect();
+    let cx = rect.width / 2, cy = rect.height / 2;
     const bagHalfW = bag.offsetWidth / 2 + 30;
     const bagHalfH = bag.offsetHeight / 2 + 30;
     const maxRadiusX = Math.max(bagHalfW + 20, rect.width / 2 - half - 6);
@@ -1077,14 +1077,34 @@
 
     // On phones the bag is so wide relative to the screen that an ellipse
     // all the way around it leaves almost no room to the sides — items get
-    // squeezed against the bag's edges. So on narrow screens only, split
-    // the items into two bands above and below the bag instead, spread
-    // across the full width. Desktop keeps the original all-around ellipse.
+    // squeezed against the bag's edges. So on narrow screens only, lay the
+    // items out as an actual grid in two bands above and below the bag,
+    // sized so every cell fits without overlapping its neighbours (growing
+    // the scatter box's height, if needed, to make room). Desktop keeps
+    // the original all-around ellipse.
     const isMobileLayout = window.innerWidth <= 640;
-    const topBandBottom = Math.max(6, cy - bagHalfH - half - 10);
-    const bottomBandTop = Math.min(rect.height - itemSize - 6, cy + bagHalfH + 10);
-    const bottomBandHeight = Math.max(0, rect.height - itemSize - 6 - bottomBandTop);
-    const perBand = Math.ceil(allItems.length / 2);
+    let grid = null;
+    if (isMobileLayout) {
+      itemSize = 58; half = itemSize / 2;
+      const gap = 10;
+      const perBand = Math.ceil(allItems.length / 2);
+      const cols = Math.max(2, Math.floor(rect.width / (itemSize + gap)));
+      const rows = Math.ceil(perBand / cols);
+      const bandHeight = rows * itemSize + (rows - 1) * gap;
+      const neededHalfHeight = bagHalfH + gap + bandHeight;
+      if (neededHalfHeight * 2 > rect.height) {
+        scatter.style.height = `${neededHalfHeight * 2}px`;
+        rect = scatter.getBoundingClientRect();
+        cx = rect.width / 2; cy = rect.height / 2;
+      }
+      const gridWidth = cols * itemSize + (cols - 1) * gap;
+      const offsetX = Math.max(gap / 2, (rect.width - gridWidth) / 2);
+      grid = {
+        cols, gap, offsetX, perBand,
+        topEdge: cy - bagHalfH - gap,   // items' bottom row sits just above this
+        bottomEdge: cy + bagHalfH + gap // items' top row starts just below this
+      };
+    }
 
     allItems.forEach((item, i) => {
       const el = document.createElement('div');
@@ -1093,17 +1113,21 @@
       el.title = item.label;
       el.dataset.id = item.id;
       el.dataset.correct = CORRECT_ITEMS.some(c => c.id === item.id) ? '1' : '0';
+      if (grid) {
+        el.style.width = `${itemSize}px`;
+        el.style.height = `${itemSize}px`;
+      }
 
       let x, y;
-      if (isMobileLayout) {
-        const inTop = i % 2 === 0;
-        const bandIndex = Math.floor(i / 2);
-        const cols = Math.ceil(perBand);
-        const colWidth = rect.width / cols;
-        x = colWidth * bandIndex + (colWidth - itemSize) / 2 + (Math.random() * 16 - 8);
+      if (grid) {
+        const inTop = i < grid.perBand;
+        const idxInBand = inTop ? i : i - grid.perBand;
+        const row = Math.floor(idxInBand / grid.cols);
+        const col = idxInBand % grid.cols;
+        x = grid.offsetX + col * (itemSize + grid.gap) + (Math.random() * 6 - 3);
         y = inTop
-          ? Math.random() * topBandBottom
-          : bottomBandTop + Math.random() * bottomBandHeight;
+          ? grid.topEdge - itemSize - row * (itemSize + grid.gap) + (Math.random() * 6 - 3)
+          : grid.bottomEdge + row * (itemSize + grid.gap) + (Math.random() * 6 - 3);
       } else {
         const angle = i * 137.508 * (Math.PI / 180);
         const t = i / (allItems.length - 1);
