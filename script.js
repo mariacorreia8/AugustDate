@@ -501,11 +501,9 @@
     const done = store.getInt(STORAGE_KEYS.gamesDone, 0);
     if (done >= 2) return; // already solved previously
     const grid = document.getElementById('wordle-grid');
-    const kb = document.getElementById('wordle-keyboard');
     const msg = document.getElementById('wordle-message');
     msg.textContent = '';
     grid.innerHTML = '';
-    kb.innerHTML = '';
 
     wordleState = { row: 0, guess: '', finished: false, keyStatus: {} };
 
@@ -520,26 +518,6 @@
       }
       grid.appendChild(rowEl);
     }
-
-    const rows = [
-      ['Q','W','E','R','T','Y','U','I','O','P'],
-      ['A','S','D','F','G','H','J','K','L','Ç'],
-      ['ENTER','Z','X','C','V','B','N','M','⌫']
-    ];
-    rows.forEach(r => {
-      const rowEl = document.createElement('div');
-      rowEl.className = 'wk-row';
-      r.forEach(k => {
-        const btn = document.createElement('button');
-        btn.className = 'wk-key' + (k.length > 1 ? ' wide' : '');
-        btn.textContent = k;
-        btn.type = 'button';
-        btn.dataset.key = k;
-        btn.addEventListener('click', () => handleWordleKey(k));
-        rowEl.appendChild(btn);
-      });
-      kb.appendChild(rowEl);
-    });
 
     document.addEventListener('keydown', wordleKeyListener);
 
@@ -635,11 +613,6 @@
       const prev = wordleState.keyStatus[l];
       if (!prev || rank[result[i]] > rank[prev]) {
         wordleState.keyStatus[l] = result[i];
-        const keyBtn = document.querySelector(`.wk-key[data-key="${l}"]`);
-        if (keyBtn) {
-          keyBtn.classList.remove('correct', 'present', 'absent');
-          keyBtn.classList.add(result[i]);
-        }
       }
     });
 

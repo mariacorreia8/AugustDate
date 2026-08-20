@@ -734,39 +734,6 @@ p { line-height: 1.6; }
 .wordle-tile.present { background: var(--mustard); border-color: var(--mustard); color: var(--white); }
 .wordle-tile.absent { background: #cfc6b4; border-color: #cfc6b4; color: var(--white); }
 
-.wordle-keyboard { display: flex; flex-direction: column; gap: 8px; align-items: center; padding-top: 0.4rem; }
-.wk-row { display: flex; gap: 6px; }
-.wk-key {
-  padding: 0.8rem 0.65rem;
-  min-width: 36px;
-  border: none;
-  border-radius: 8px;
-  background: var(--sandy-2);
-  color: var(--deep-blue-2);
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-.wk-key.wide { min-width: 62px; font-size: 0.78rem; }
-.wk-key.correct { background: var(--olive); color: var(--white); }
-.wk-key.present { background: var(--mustard); color: var(--white); }
-.wk-key.absent { background: #b9b0a0; color: var(--white); }
-
-/* On phones the keyboard was wider than the game panel and spilled outside
-   it — shrink keys and let rows fill the available width instead of a
-   fixed min-width per key. */
-@media (max-width: 640px) {
-  .wordle-layout { gap: 1rem; }
-  .wordle-keyboard { width: 100%; max-width: min(360px, 92vw); margin: 0 auto; gap: 6px; }
-  .wk-row { width: 100%; gap: 4px; }
-  .wk-key {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 0.7rem 0.2rem;
-    font-size: 0.72rem;
-  }
-  .wk-key.wide { flex: 1.6 1 0; font-size: 0.62rem; }
-}
 
 /* Lemon catch & runner canvas — soft pastel wash instead of a strong blue */
 #lemon-canvas, #runner-canvas {
