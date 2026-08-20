@@ -43,6 +43,7 @@
     gamesDone: 'md_games_done',      // integer 0-5, how many games completed in order
     fullyUnlocked: 'md_unlocked',    // 'true' once all 5 games are done
     bypassLock: 'md_bypass_lock',    // 'true' once password used on landing screen
+    bypassLevel2: 'md_bypass_lvl2',  // 'true' once password used on the "Falta pouco" screen
     musicOn: 'md_music_on',
     packedItems: 'md_packed_items'   // JSON array, so the packing game can restore state
   };
@@ -362,7 +363,9 @@
     }
   });
 
-  // In-game password form: skips the currently active game
+  // In-game password form: skips the currently active game, or — if the
+  // "Falta pouco" time-lock panel is what's showing — bypasses that lock
+  // instead, so testing isn't stuck waiting for Saturday 13:00.
   document.getElementById('game-password-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const input = document.getElementById('game-password-input');
@@ -370,8 +373,13 @@
     if (input.value.trim().toLowerCase() === CONFIG.password) {
       err.textContent = '';
       input.value = '';
-      const current = store.getInt(STORAGE_KEYS.gamesDone, 0) + 1;
-      completeGame(Math.min(current, 5));
+      if (lockedPanel.classList.contains('active')) {
+        store.set(STORAGE_KEYS.bypassLevel2, 'true');
+        showCurrentGamePanel();
+      } else {
+        const current = store.getInt(STORAGE_KEYS.gamesDone, 0) + 1;
+        completeGame(Math.min(current, 5));
+      }
     } else {
       err.textContent = 'Palavra-passe incorreta. Tenta outra vez.';
     }
@@ -400,7 +408,7 @@
   // (Friday night). Games 2-5 stay behind a second gate until Saturday
   // 13:00 — the same "we leave home" moment shown on the landing countdown.
   function isLevel2Unlocked() {
-    return Date.now() >= countdownTarget;
+    return Date.now() >= countdownTarget || store.get(STORAGE_KEYS.bypassLevel2, 'false') === 'true';
   }
 
   function renderGamesProgress() {
@@ -1067,6 +1075,17 @@
     const maxRadiusX = Math.max(bagHalfW + 20, rect.width / 2 - half - 6);
     const maxRadiusY = Math.max(bagHalfH + 20, rect.height / 2 - half - 6);
 
+    // On phones the bag is so wide relative to the screen that an ellipse
+    // all the way around it leaves almost no room to the sides — items get
+    // squeezed against the bag's edges. So on narrow screens only, split
+    // the items into two bands above and below the bag instead, spread
+    // across the full width. Desktop keeps the original all-around ellipse.
+    const isMobileLayout = window.innerWidth <= 640;
+    const topBandBottom = Math.max(6, cy - bagHalfH - half - 10);
+    const bottomBandTop = Math.min(rect.height - itemSize - 6, cy + bagHalfH + 10);
+    const bottomBandHeight = Math.max(0, rect.height - itemSize - 6 - bottomBandTop);
+    const perBand = Math.ceil(allItems.length / 2);
+
     allItems.forEach((item, i) => {
       const el = document.createElement('div');
       el.className = 'pack-item';
@@ -1075,12 +1094,24 @@
       el.dataset.id = item.id;
       el.dataset.correct = CORRECT_ITEMS.some(c => c.id === item.id) ? '1' : '0';
 
-      const angle = i * 137.508 * (Math.PI / 180);
-      const t = i / (allItems.length - 1);
-      const radiusX = bagHalfW + t * (maxRadiusX - bagHalfW) + (Math.random() * 16 - 8);
-      const radiusY = bagHalfH + t * (maxRadiusY - bagHalfH) + (Math.random() * 16 - 8);
-      let x = cx + radiusX * Math.cos(angle) - half;
-      let y = cy + radiusY * Math.sin(angle) - half;
+      let x, y;
+      if (isMobileLayout) {
+        const inTop = i % 2 === 0;
+        const bandIndex = Math.floor(i / 2);
+        const cols = Math.ceil(perBand);
+        const colWidth = rect.width / cols;
+        x = colWidth * bandIndex + (colWidth - itemSize) / 2 + (Math.random() * 16 - 8);
+        y = inTop
+          ? Math.random() * topBandBottom
+          : bottomBandTop + Math.random() * bottomBandHeight;
+      } else {
+        const angle = i * 137.508 * (Math.PI / 180);
+        const t = i / (allItems.length - 1);
+        const radiusX = bagHalfW + t * (maxRadiusX - bagHalfW) + (Math.random() * 16 - 8);
+        const radiusY = bagHalfH + t * (maxRadiusY - bagHalfH) + (Math.random() * 16 - 8);
+        x = cx + radiusX * Math.cos(angle) - half;
+        y = cy + radiusY * Math.sin(angle) - half;
+      }
       x = Math.max(0, Math.min(rect.width - itemSize, x));
       y = Math.max(0, Math.min(rect.height - itemSize, y));
       const rotation = (Math.random() * 16 - 8).toFixed(1);
