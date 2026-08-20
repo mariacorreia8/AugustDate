@@ -1163,24 +1163,33 @@
         el.classList.add('dragging');
       });
 
+      // Whether the item's own dragged box overlaps the bag's box — using
+      // the item's real, current bounding rect (which already accounts for
+      // the drag transform) rather than the pointer's raw coordinates. On
+      // some phones the final pointerup coordinates don't reliably match
+      // where the finger actually was, which made items compare as "over
+      // the bag" even when dropped well clear of it, and snap back instead
+      // of staying put.
+      function overlapsBag() {
+        const elRect = el.getBoundingClientRect();
+        const bagRect = bag.getBoundingClientRect();
+        return elRect.left < bagRect.right && elRect.right > bagRect.left &&
+          elRect.top < bagRect.bottom && elRect.bottom > bagRect.top;
+      }
+
       el.addEventListener('pointermove', (e) => {
         if (!el.classList.contains('dragging')) return;
         dx = e.clientX - startX; dy = e.clientY - startY;
         if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
         el.style.transform = `translate(${dx}px, ${dy}px) rotate(${el.dataset.rotation}deg)`;
-        const bagRect = bag.getBoundingClientRect();
-        const over = e.clientX >= bagRect.left && e.clientX <= bagRect.right &&
-          e.clientY >= bagRect.top && e.clientY <= bagRect.bottom;
-        bag.classList.toggle('drag-over', over);
+        bag.classList.toggle('drag-over', overlapsBag());
       });
 
       el.addEventListener('pointerup', (e) => {
         if (!el.classList.contains('dragging')) return;
         el.classList.remove('dragging');
         bag.classList.remove('drag-over');
-        const bagRect = bag.getBoundingClientRect();
-        const overBag = e.clientX >= bagRect.left && e.clientX <= bagRect.right &&
-          e.clientY >= bagRect.top && e.clientY <= bagRect.bottom;
+        const overBag = overlapsBag();
 
         if (!moved || overBag) {
           // a tap (no movement) or a real drop on the bag — both pack it
@@ -1199,6 +1208,17 @@
         const newTop = el.offsetTop + dy;
         el.style.left = `${Math.max(0, Math.min(scatterRect.width - size, newLeft))}px`;
         el.style.top = `${Math.max(0, Math.min(scatterRect.height - size, newTop))}px`;
+        el.style.transform = `rotate(${el.dataset.rotation}deg)`;
+      });
+
+      // If the browser cancels the touch mid-drag (e.g. an incoming
+      // notification, or the OS deciding it's a scroll after all), just
+      // drop back to the original spot instead of leaving the item stuck
+      // in "dragging" mode, unresponsive to further taps.
+      el.addEventListener('pointercancel', () => {
+        if (!el.classList.contains('dragging')) return;
+        el.classList.remove('dragging');
+        bag.classList.remove('drag-over');
         el.style.transform = `rotate(${el.dataset.rotation}deg)`;
       });
     }
