@@ -1185,8 +1185,20 @@
         if (!moved || overBag) {
           // a tap (no movement) or a real drop on the bag — both pack it
           tryPack(item, el, moved ? e : null);
+          el.style.transform = `rotate(${el.dataset.rotation}deg)`;
+          return;
         }
-        // snap back to its spot if dropped outside the bag without packing
+
+        // Dropped outside the bag: keep it wherever it was dragged to
+        // instead of snapping back to its original spot. That way, if the
+        // auto-scatter left a couple of items overlapping, they can just be
+        // dragged apart by hand.
+        const scatterRect = scatter.getBoundingClientRect();
+        const size = el.offsetWidth;
+        const newLeft = el.offsetLeft + dx;
+        const newTop = el.offsetTop + dy;
+        el.style.left = `${Math.max(0, Math.min(scatterRect.width - size, newLeft))}px`;
+        el.style.top = `${Math.max(0, Math.min(scatterRect.height - size, newTop))}px`;
         el.style.transform = `rotate(${el.dataset.rotation}deg)`;
       });
     }
